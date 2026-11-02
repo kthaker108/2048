@@ -1,23 +1,32 @@
 @import "helpers";
 @import "fonts/clear-sans.css";
+@import "fonts/fredoka.css";
+
+$body-font: "Clear Sans", "Helvetica Neue", Arial, sans-serif;
+$number-font: "Fredoka", $body-font;
 
 $field-width: 500px;
 $grid-spacing: 15px;
 $grid-row-cells: 4;
 $tile-size: ($field-width - $grid-spacing * ($grid-row-cells + 1)) / $grid-row-cells;
-$tile-border-radius: 3px;
+$tile-border-radius: 8px;
 
 $mobile-threshold: $field-width + 20px;
 
-$text-color: #776E65;
-$bright-text-color: #f9f6f2;
+$text-color: #4a5578;
+$bright-text-color: #f7f9ff;
+$dark-text-color: #2f3b5c;
 
-$tile-color: #eee4da;
-$tile-gold-color: #edc22e;
-$tile-gold-glow-color: lighten($tile-gold-color, 15%);
+$page-background: #f4f6fd;
+$accent-color: #4a66b5;
+$shadow-color: #6b7bb0;
+
+$tile-color: #f8fbff;
+$tile-gradient-start: #a8d8ff;
+$tile-gradient-end: #d9b3ff;
 
 $game-container-margin-top: 40px;
-$game-container-background: #bbada0;
+$game-container-background: #cdd8f0;
 
 $transition-speed: 100ms;
 
@@ -25,10 +34,17 @@ html, body {
   margin: 0;
   padding: 0;
 
-  background: #faf8ef;
   color: $text-color;
-  font-family: "Clear Sans", "Helvetica Neue", Arial, sans-serif;
+  font-family: $body-font;
   font-size: 18px;
+}
+
+html {
+  min-height: 100%;
+  background: radial-gradient(circle at 15% 0%, rgba($tile-gradient-start, .45), transparent 50%),
+              radial-gradient(circle at 90% 100%, rgba($tile-gradient-end, .35), transparent 50%),
+              $page-background;
+  background-attachment: fixed;
 }
 
 body {
@@ -45,6 +61,12 @@ h1.title {
   margin: 0;
   display: block;
   float: left;
+
+  color: $accent-color;
+  background: linear-gradient(135deg, #4a86d0, #6b7be0 60%, #9068d8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 @include keyframes(move-up) {
@@ -71,14 +93,16 @@ h1.title {
   display: inline-block;
   background: $game-container-background;
   padding: 15px 25px;
+  font-family: $number-font;
   font-size: $height;
   height: $height;
   line-height: $height + 22px;
   font-weight: bold;
-  border-radius: 3px;
-  color: white;
+  border-radius: $tile-border-radius;
+  color: $dark-text-color;
   margin-top: 8px;
   text-align: center;
+  box-shadow: inset 0 0 0 1px rgba($accent-color, .2);
 
   &:after {
     position: absolute;
@@ -86,20 +110,20 @@ h1.title {
     top: 10px;
     left: 0;
     text-transform: uppercase;
+    font-family: $body-font;
     font-size: 13px;
     line-height: 13px;
     text-align: center;
-    color: $tile-color;
+    color: $text-color;
   }
 
   .score-addition {
     position: absolute;
     right: 30px;
-    color: red;
     font-size: $height;
     line-height: $height;
     font-weight: bold;
-    color: rgba($text-color, .9);
+    color: rgba($accent-color, .9);
     z-index: 100;
     @include animation(move-up 600ms ease-in);
     @include animation-fill-mode(both);
@@ -121,13 +145,15 @@ p {
 }
 
 a {
-  color: $text-color;
+  color: $accent-color;
   font-weight: bold;
   text-decoration: underline;
   cursor: pointer;
 }
 
 strong {
+  color: $dark-text-color;
+
   &.important {
     text-transform: uppercase;
   }
@@ -135,7 +161,7 @@ strong {
 
 hr {
   border: none;
-  border-bottom: 1px solid lighten($text-color, 40%);
+  border-bottom: 1px solid rgba($text-color, .2);
   margin-top: 20px;
   margin-bottom: 30px;
 }
@@ -158,13 +184,19 @@ hr {
 // Styles for buttons
 @mixin button {
   display: inline-block;
-  background: darken($game-container-background, 20%);
-  border-radius: 3px;
+  background: linear-gradient(135deg, $tile-gradient-start, $tile-gradient-end);
+  border-radius: $tile-border-radius;
   padding: 0 20px;
   text-decoration: none;
-  color: $bright-text-color;
+  color: $dark-text-color;
   height: 40px;
   line-height: 42px;
+  box-shadow: 0 4px 12px rgba($shadow-color, .3);
+  @include transition(box-shadow $transition-speed * 2 ease);
+
+  &:hover {
+    box-shadow: 0 4px 18px rgba($shadow-color, .55);
+  }
 }
 
 // Game field mixin used to render CSS at different width
@@ -187,6 +219,7 @@ hr {
 
     background: $game-container-background;
     border-radius: $tile-border-radius * 2;
+    box-shadow: 0 16px 40px rgba($shadow-color, .25), inset 0 0 0 1px rgba(white, .5);
     width: $field-width;
     height: $field-width;
     -webkit-box-sizing: border-box;
@@ -201,12 +234,14 @@ hr {
       right: 0;
       bottom: 0;
       left: 0;
-      background: rgba($tile-color, .5);
+      background: rgba($page-background, .78);
+      border-radius: $tile-border-radius * 2;
       z-index: 100;
 
       text-align: center;
 
       p {
+        color: $dark-text-color;
         font-size: 60px;
         font-weight: bold;
         height: 60px;
@@ -235,8 +270,11 @@ hr {
       @include animation-fill-mode(both);
 
       &.game-won {
-        background: rgba($tile-gold-color, .5);
-        color: $bright-text-color;
+        background: linear-gradient(135deg, rgba($tile-gradient-start, .85), rgba($tile-gradient-end, .85));
+
+	a {
+	  background: $page-background;
+	}
 
 	a.keep-playing-button {
 	  display: inline-block;
@@ -276,7 +314,7 @@ hr {
 
     border-radius: $tile-border-radius;
 
-    background: rgba($tile-color, .35);
+    background: rgba(white, .3);
 
     &:last-child {
       margin-right: 0;
@@ -318,7 +356,9 @@ hr {
     border-radius: $tile-border-radius;
 
     background: $tile-color;
+    color: $dark-text-color;
     text-align: center;
+    font-family: $number-font;
     font-weight: bold;
     z-index: 10;
 
@@ -335,51 +375,35 @@ hr {
   $exponent: 1;
   $limit: 11;
 
-  // Colors for all 11 states, false = no special color
-  $special-colors: false false, // 2
-                   false false, // 4
-                   #f78e48 true, // 8
-                   #fc5e2e true, // 16
-                   #ff3333 true, // 32
-                   #ff0000 true, // 64
-                   false true, // 128
-                   false true, // 256
-                   false true, // 512
-                   false true, // 1024
-                   false true; // 2048
+  // Pastel backgrounds for all 11 states, powder blue through mint and periwinkle to orchid
+  $tile-colors: $tile-color, // 2
+                #d9ecff, // 4
+                #bfe3fa, // 8
+                #b5eef0, // 16
+                #b8efd6, // 32
+                #92e0c4, // 64
+                #a8c8fa, // 128
+                #b4b8fb, // 256
+                #cdb8fa, // 512
+                #e3b9f5, // 1024
+                #c2b8ff; // 2048
 
   // Build tile colors
   @while $exponent <= $limit {
     $power: pow($base, $exponent);
 
     &.tile-#{$power} .tile-inner {
-      // Calculate base background color
-      $gold-percent: ($exponent - 1) / ($limit - 1) * 100;
-      $mixed-background: mix($tile-gold-color, $tile-color, $gold-percent);
-
-      $nth-color: nth($special-colors, $exponent);
-
-      $special-background: nth($nth-color, 1);
-      $bright-color: nth($nth-color, 2);
-
-      @if $special-background {
-        $mixed-background: mix($special-background, $mixed-background, 55%);
-      }
-
-      @if $bright-color {
-        color: $bright-text-color;
-      }
+      $background: nth($tile-colors, $exponent);
 
       // Set background
-      background: $mixed-background;
+      background: $background;
 
       // Add glow
       $glow-opacity: max($exponent - 4, 0) / ($limit - 4);
 
-      @if not $special-background {
-        box-shadow: 0 0 30px 10px rgba($tile-gold-glow-color, $glow-opacity / 1.8),
-                    inset 0 0 0 1px rgba(white, $glow-opacity / 3);
-      }
+      box-shadow: 0 2px 6px rgba($shadow-color, .25),
+                  0 0 30px 10px rgba($background, $glow-opacity / 1.8),
+                  inset 0 0 0 1px rgba(white, $glow-opacity / 3);
 
       // Adjust font size for bigger numbers
       @if $power >= 100 and $power < 1000 {
@@ -401,10 +425,16 @@ hr {
     $exponent: $exponent + 1;
   }
 
+  &.tile-2048 .tile-inner {
+    background: linear-gradient(135deg, $tile-gradient-start, $tile-gradient-end);
+  }
+
   // Super tiles (above 2048)
   &.tile-super .tile-inner {
     color: $bright-text-color;
-    background: mix(#333, $tile-gold-color, 95%);
+    background: #5b5f97;
+    box-shadow: 0 0 30px 10px rgba($tile-gradient-end, .6),
+                inset 0 0 0 2px $tile-gradient-end;
 
     font-size: 30px;
 
@@ -474,12 +504,13 @@ hr {
 
 @include smaller($mobile-threshold) {
   // Redefine variables for smaller screens
-  $field-width: 280px;
-  $grid-spacing: 10px;
-  $grid-row-cells: 4;
-  $tile-size: ($field-width - $grid-spacing * ($grid-row-cells + 1)) / $grid-row-cells;
-  $tile-border-radius: 3px;
-  $game-container-margin-top: 17px;
+  // These must be global so the game-field mixin picks them up
+  $field-width: 280px !global;
+  $grid-spacing: 10px !global;
+  $grid-row-cells: 4 !global;
+  $tile-size: ($field-width - $grid-spacing * ($grid-row-cells + 1)) / $grid-row-cells !global;
+  $tile-border-radius: 5px !global;
+  $game-container-margin-top: 17px !global;
 
   html, body {
     font-size: 15px;
@@ -531,6 +562,7 @@ hr {
 
   // Rest of the font-size adjustments in the tile class
   .tile .tile-inner {
+    border-radius: $tile-border-radius;
     font-size: 35px;
   }
 
